@@ -35,7 +35,7 @@ GitLab can be configured to email updates under different circumstances: any act
 This leaves me with a choice of receiving notifications only for threads I'm involved in or for all threads but without the ability to easily find requests directed to me.
 
 # The Solution
-Google Apps Script provides a method of automating many operations on a Gmail account (sending email, searching, labeling, etc.) via the [GmailApp](https://developers.google.com/apps-script/reference/gmail) class. The `gmail-gitlab-filtering.gs` script is run every 10 minutes via a trigger on scripts.google.com and performs filtering and labeling based on the `X-GitLab` headers.
+Google Apps Script provides a method of automating many operations on a Gmail account (sending email, searching, labeling, etc.) via the [GmailApp](https://developers.google.com/apps-script/reference/gmail) class. The `gmail-gitlab-filtering.gs` script is run every 10 minutes via a trigger on script.google.com and performs filtering and labeling based on the `X-GitLab` headers.
 
 This allows me to appropriately label notifications that are directed to me, as well as dynamically create labels for notifications received from new projects.
 
