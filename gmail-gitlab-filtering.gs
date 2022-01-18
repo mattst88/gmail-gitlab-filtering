@@ -59,6 +59,8 @@ function processLabel(unprocessedLabel) {
   /* Remove labels from threads */
   for (const label of [personalLabel, unprocessedLabel]) {
     const threads = toRemoveThreads.get(label);
+    if (!threads)
+      continue;
     Logger.log("Removing " + label.getName() + " label from " + threads.length + " threads");
 
     for (let i = 0; i < threads.length; i += chunk_size) {
