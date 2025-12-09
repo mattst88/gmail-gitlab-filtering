@@ -14,10 +14,6 @@ function processInbox() {
   }
 }
 
-let toInboxThreads = [];
-let toRemoveThreads = new Map();
-let toAddThreads = new Map();
-
 /* the GmailLabel.addToThreads/removeFromThreads functions
  * only process 100 threads at a time */
 function processInChunks(threads, callback) {
@@ -30,6 +26,10 @@ function processInChunks(threads, callback) {
 }
 
 function processLabel(unprocessedLabel) {
+  const toInboxThreads = [];
+  const toRemoveThreads = new Map();
+  const toAddThreads = new Map();
+
   const threads = GmailApp.search(`label:${unprocessedLabel.getName()}`, 0, maxThreads);
   if (threads.length < 1) {
     Logger.log(`No threads to process with label:${unprocessedLabel.getName()}`);
@@ -37,10 +37,56 @@ function processLabel(unprocessedLabel) {
   }
   Logger.log(`Processing threads with label:${unprocessedLabel.getName()}`);
 
+  function processThread(thread) {
+    let moveToInbox = false;
+    const labelNames = new Set();
+
+    const messages = thread.getMessages();
+    for (const message of messages) {
+      /* If the X-GitLab-NotificationReason header exists in any message
+       * in the thread, it was sent to us because we were mentioned, we participated, etc.
+       * We want to move those threads to the Inbox. */
+      const notificationReason = message.getHeader("X-GitLab-NotificationReason");
+      if (notificationReason) {
+        moveToInbox = true;
+      }
+
+      /* Collect project paths in a Set to automatically deduplicate */
+      const projectPath = message.getHeader("X-GitLab-Project-Path");
+      if (projectPath) {
+        labelNames.add(projectPath);
+      }
+    }
+
+    for (const labelName of labelNames) {
+      /* Get/create a label nested under our unprocessed label */
+      const label = getLabel(`${unprocessedLabel.getName()}/${labelName}`);
+
+      if (!toAddThreads.has(label)) {
+        toAddThreads.set(label, []);
+      }
+      toAddThreads.get(label).push(thread);
+    }
+
+    if (moveToInbox) {
+      toInboxThreads.push(thread);
+    } else {
+      if (!toRemoveThreads.has(personalLabel)) {
+        toRemoveThreads.set(personalLabel, []);
+      }
+      toRemoveThreads.get(personalLabel).push(thread);
+    }
+
+    if (!toRemoveThreads.has(unprocessedLabel)) {
+      toRemoveThreads.set(unprocessedLabel, []);
+    }
+    toRemoveThreads.get(unprocessedLabel).push(thread);
+  }
+
   for (const [i, thread] of threads.entries()) {
     Logger.log(`Processing thread ${i}`);
 
-    processThread(unprocessedLabel, thread);
+    processThread(thread);
   }
 
   /* Apply labels to threads */
@@ -63,52 +109,6 @@ function processLabel(unprocessedLabel) {
     Logger.log(`Removing ${label.getName()} label from ${threads.length} threads`);
     processInChunks(threads, (chunk) => label.removeFromThreads(chunk));
   }
-}
-
-function processThread(unprocessedLabel, thread) {
-  let moveToInbox = false;
-  const labelNames = new Set();
-
-  const messages = thread.getMessages();
-  for (const message of messages) {
-    /* If the X-GitLab-NotificationReason header exists in any message
-     * in the thread, it was sent to us because we were mentioned, we participated, etc.
-     * We want to move those threads to the Inbox. */
-    const notificationReason = message.getHeader("X-GitLab-NotificationReason");
-    if (notificationReason) {
-      moveToInbox = true;
-    }
-
-    /* Collect project paths in a Set to automatically deduplicate */
-    const projectPath = message.getHeader("X-GitLab-Project-Path");
-    if (projectPath) {
-      labelNames.add(projectPath);
-    }
-  }
-
-  for (const labelName of labelNames) {
-    /* Get/create a label nested under our unprocessed label */
-    const label = getLabel(`${unprocessedLabel.getName()}/${labelName}`);
-
-    if (!toAddThreads.has(label)) {
-      toAddThreads.set(label, []);
-    }
-    toAddThreads.get(label).push(thread);
-  }
-
-  if (moveToInbox) {
-    toInboxThreads.push(thread);
-  } else {
-    if (!toRemoveThreads.has(personalLabel)) {
-      toRemoveThreads.set(personalLabel, []);
-    }
-    toRemoveThreads.get(personalLabel).push(thread);
-  }
-
-  if (!toRemoveThreads.has(unprocessedLabel)) {
-    toRemoveThreads.set(unprocessedLabel, []);
-  }
-  toRemoveThreads.get(unprocessedLabel).push(thread);
 }
 
 /* Makes a hash table of "name" -> label */
