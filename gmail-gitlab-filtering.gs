@@ -18,6 +18,17 @@ let toInboxThreads = [];
 let toRemoveThreads = new Map();
 let toAddThreads = new Map();
 
+/* the GmailLabel.addToThreads/removeFromThreads functions
+ * only process 100 threads at a time */
+function processInChunks(threads, callback) {
+  const chunkSize = 100;
+  for (let i = 0; i < threads.length; i += chunkSize) {
+    const end = Math.min(i + chunkSize, threads.length);
+    callback(threads.slice(i, end));
+    Logger.log("\t... " + end + " done");
+  }
+}
+
 function processLabel(unprocessedLabel) {
   let threads = GmailApp.search("label:" + unprocessedLabel.getName(), 0, maxThreads);
   if (threads.length < 1) {
@@ -33,27 +44,16 @@ function processLabel(unprocessedLabel) {
     processThread(unprocessedLabel, thread);
   }
 
-  /* the GmailLabel.addToThreads/removeFromThreads functions
-   * only process 100 threads at a time */
-  const chunk_size = 100;
-
   /* Apply labels to threads */
   for (const [label, threads] of toAddThreads) {
     Logger.log("Adding " + label.getName() + " label to " + threads.length + " threads");
-
-    for (let i = 0; i < threads.length; i += chunk_size) {
-      const end = Math.min(i+chunk_size, threads.length);
-      label.addToThreads(threads.slice(i, end));
-      Logger.log("\t... " + end + " done");
-    }
+    processInChunks(threads, (chunk) => label.addToThreads(chunk));
   }
 
   /* Move threads to Inbox */
-  Logger.log("Moving " + toInboxThreads.length + " to Inbox");
-  for (let i = 0; i < toInboxThreads.length; i += chunk_size) {
-    const end = Math.min(i+chunk_size, toInboxThreads.length);
-    GmailApp.moveThreadsToInbox(toInboxThreads.slice(i, end));
-    Logger.log("\t... " + end + " done")
+  if (toInboxThreads.length > 0) {
+    Logger.log("Moving " + toInboxThreads.length + " to Inbox");
+    processInChunks(toInboxThreads, (chunk) => GmailApp.moveThreadsToInbox(chunk));
   }
 
   /* Remove labels from threads */
@@ -62,12 +62,7 @@ function processLabel(unprocessedLabel) {
     if (!threads)
       continue;
     Logger.log("Removing " + label.getName() + " label from " + threads.length + " threads");
-
-    for (let i = 0; i < threads.length; i += chunk_size) {
-      const end = Math.min(i+chunk_size, threads.length);
-      label.removeFromThreads(threads.slice(i, end));
-      Logger.log("\t... " + end + " done");
-    }
+    processInChunks(threads, (chunk) => label.removeFromThreads(chunk));
   }
 }
 
