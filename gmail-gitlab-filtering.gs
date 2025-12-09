@@ -75,12 +75,12 @@ function processThread(unprocessedLabel, thread) {
   let moveToInbox = false;
   let labelNames = [];
 
-  let messages = thread.getMessages();
+  const messages = thread.getMessages();
   for (const message of messages) {
     /* If the X-GitLab-NotificationReason header exists in any message
      * in the thread, it was sent to us because we were mentioned, we participated, etc.
      * We want to move those threads to the Inbox. */
-    let notificationReason = message.getHeader("X-GitLab-NotificationReason")
+    const notificationReason = message.getHeader("X-GitLab-NotificationReason");
     if (notificationReason) {
       moveToInbox = true;
     }
