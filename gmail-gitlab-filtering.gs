@@ -34,9 +34,8 @@ function processLabel(unprocessedLabel) {
   if (threads.length < 1) {
     Logger.log(`No threads to process with label:${unprocessedLabel.getName()}`);
     return;
-  } else {
-    Logger.log(`Processing threads with label:${unprocessedLabel.getName()}`);
   }
+  Logger.log(`Processing threads with label:${unprocessedLabel.getName()}`);
 
   for (const [i, thread] of threads.entries()) {
     Logger.log(`Processing thread ${i}`);
