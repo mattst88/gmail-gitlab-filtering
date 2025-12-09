@@ -130,12 +130,8 @@ function updateUserLabels() {
 /* Returns a GmailLabel given a name string.
  * If it doesn't exist, it creates it. */
 function getLabel(name) {
-  let label;
   if (!userLabels[name]) {
-    label = GmailApp.createLabel(name);
-    updateUserLabels();
-  } else {
-    label = userLabels[name];
+    userLabels[name] = GmailApp.createLabel(name);
   }
-  return label;
+  return userLabels[name];
 }
