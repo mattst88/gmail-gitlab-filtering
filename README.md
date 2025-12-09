@@ -11,18 +11,18 @@ Receiving all messages from a mailing list and filtering by whether I am a direc
 
 With mailing lists, I accomplish this with a combination of Gmail filters:
 
-````
+```
 Matches: to:(mattst88@gmail.com)
 Do this: Apply label "mattst88"
-````
-````
+```
+```
 Matches: list:mesa-dev.lists.freedesktop.org
 Do this: Apply label "mesa-dev"
-````
-````
+```
+```
 Matches: -{to:mattst88@gmail.com}
 Do this: Skip Inbox
-````
+```
 
 Thus, mail from mailing lists is labeled appropriately and doesn't clutter my inbox. Any messages with me in `To:` or `Cc:` cause the thread to be labeled with a personal `mattst88` label and appear in the inbox.
 
@@ -42,10 +42,10 @@ This allows me to appropriately label notifications that are directed to me, as 
 ## How
 Email from GitLab is labeled using Gmail's default filtering with a top-level label and skips the inbox. In my case, all mail from `gitlab@gitlab.freedesktop.org` is given the `freedesktop` label:
 
-````
+```
 Matches: from:(gitlab@gitlab.freedesktop.org)
 Do this: Skip Inbox, Apply label "freedesktop"
-````
+```
 
 Threads with this label are considered unprocessed.
 
