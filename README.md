@@ -70,7 +70,7 @@ To fit into the 6 minutes / execution limit, the script operates on a maximum of
 
 I reached the 20,000 / day email read/write quota during development and expect to never reach it again now that the script functions.
 
-To improve efficiency (and perhaps avoid hitting quotas), the script creates lists of [GmailThread](https://developers.google.com/apps-script/reference/gmail/gmail-thread)s so they can be passed in batches to [GmailApp.moveThreadsToInbox](https://developers.google.com/apps-script/reference/gmail/gmail-app#moveThreadsToInbox(GmailThread)), [GmailLabel.addToThreads](addToThreads), and [GmailLabel.removeFromThreads](https://developers.google.com/apps-script/reference/gmail/gmail-label#removeFromThreads(GmailThread))  †. It's unclear to me which functions use quota and how much they use.
+To improve efficiency (and perhaps avoid hitting quotas), the script creates lists of [GmailThread](https://developers.google.com/apps-script/reference/gmail/gmail-thread)s so they can be passed in batches to [GmailApp.moveThreadsToInbox](https://developers.google.com/apps-script/reference/gmail/gmail-app#moveThreadsToInbox(GmailThread)), [GmailLabel.addToThreads](https://developers.google.com/apps-script/reference/gmail/gmail-label#addToThreads(GmailThread)), and [GmailLabel.removeFromThreads](https://developers.google.com/apps-script/reference/gmail/gmail-label#removeFromThreads(GmailThread))  †. It's unclear to me which functions use quota and how much they use.
 
 † These functions accept only 100 threads per call, so the script calls them multiple times on `.slice()`s of the lists.
 
