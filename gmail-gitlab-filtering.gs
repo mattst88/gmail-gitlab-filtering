@@ -114,11 +114,7 @@ function processThread(unprocessedLabel, thread) {
 
 /* Makes a hash table of "name" -> label */
 function makeNameToLabelTbl(labels) {
-  let table = {};
-  for (const label of labels) {
-    table[label.getName()] = label;
-  }
-  return table;
+  return Object.fromEntries(labels.map(label => [label.getName(), label]));
 }
 
 /* Cache of user labels, indexed by name string */
