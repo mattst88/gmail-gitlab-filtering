@@ -114,7 +114,7 @@ function processThread(unprocessedLabel, thread) {
 
 /* Makes a hash table of "name" -> label */
 function makeNameToLabelTbl(labels) {
-  let table = [];
+  let table = {};
   for (const label of labels) {
     table[label.getName()] = label;
   }
@@ -122,7 +122,7 @@ function makeNameToLabelTbl(labels) {
 }
 
 /* Cache of user labels, indexed by name string */
-let userLabels = [];
+let userLabels = {};
 function updateUserLabels() {
   userLabels = makeNameToLabelTbl(GmailApp.getUserLabels());
 }
