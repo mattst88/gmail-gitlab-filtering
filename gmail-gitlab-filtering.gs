@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 
-const personalLabelName = "mattst88"
+const personalLabelName = "mattst88";
 const unprocessedLabels = ["freedesktop"];
 const maxThreads = 240;
 
