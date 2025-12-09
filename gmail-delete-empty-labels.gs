@@ -7,10 +7,10 @@ function deleteEmptyLabels() {
 
   for (const label of userLabels) {
     for (const prefix of labelPrefixes) {
-      if (label.getName().startsWith(prefix + '/')) {
+      if (label.getName().startsWith(`${prefix}/`)) {
         const threads = label.getThreads(0, 1);
         if (threads.length == 0) {
-          Logger.log(label.getName() + " is empty");
+          Logger.log(`${label.getName()} is empty`);
           label.deleteLabel();
         }
       }

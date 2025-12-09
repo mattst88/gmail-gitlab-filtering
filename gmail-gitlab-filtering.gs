@@ -25,34 +25,34 @@ function processInChunks(threads, callback) {
   for (let i = 0; i < threads.length; i += chunkSize) {
     const end = Math.min(i + chunkSize, threads.length);
     callback(threads.slice(i, end));
-    Logger.log("\t... " + end + " done");
+    Logger.log(`\t... ${end} done`);
   }
 }
 
 function processLabel(unprocessedLabel) {
-  let threads = GmailApp.search("label:" + unprocessedLabel.getName(), 0, maxThreads);
+  const threads = GmailApp.search(`label:${unprocessedLabel.getName()}`, 0, maxThreads);
   if (threads.length < 1) {
-    Logger.log("No threads to process with label:" + unprocessedLabel.getName());
+    Logger.log(`No threads to process with label:${unprocessedLabel.getName()}`);
     return;
   } else {
-    Logger.log("Processing threads with label:" + unprocessedLabel.getName());
+    Logger.log(`Processing threads with label:${unprocessedLabel.getName()}`);
   }
 
   for (const [i, thread] of threads.entries()) {
-    Logger.log("Processing thread " + i);
+    Logger.log(`Processing thread ${i}`);
 
     processThread(unprocessedLabel, thread);
   }
 
   /* Apply labels to threads */
   for (const [label, threads] of toAddThreads) {
-    Logger.log("Adding " + label.getName() + " label to " + threads.length + " threads");
+    Logger.log(`Adding ${label.getName()} label to ${threads.length} threads`);
     processInChunks(threads, (chunk) => label.addToThreads(chunk));
   }
 
   /* Move threads to Inbox */
   if (toInboxThreads.length > 0) {
-    Logger.log("Moving " + toInboxThreads.length + " to Inbox");
+    Logger.log(`Moving ${toInboxThreads.length} to Inbox`);
     processInChunks(toInboxThreads, (chunk) => GmailApp.moveThreadsToInbox(chunk));
   }
 
@@ -61,7 +61,7 @@ function processLabel(unprocessedLabel) {
     const threads = toRemoveThreads.get(label);
     if (!threads)
       continue;
-    Logger.log("Removing " + label.getName() + " label from " + threads.length + " threads");
+    Logger.log(`Removing ${label.getName()} label from ${threads.length} threads`);
     processInChunks(threads, (chunk) => label.removeFromThreads(chunk));
   }
 }
@@ -89,7 +89,7 @@ function processThread(unprocessedLabel, thread) {
 
   for (const labelName of labelNames) {
     /* Get/create a label nested under our unprocessed label */
-    const label = getLabel(unprocessedLabel.getName() + "/" + labelName);
+    const label = getLabel(`${unprocessedLabel.getName()}/${labelName}`);
 
     if (!toAddThreads.has(label)) {
       toAddThreads.set(label, []);
