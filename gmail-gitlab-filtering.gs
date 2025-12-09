@@ -6,11 +6,11 @@ const maxThreads = 240;
 
 let personalLabel;
 function processInbox() {
-  updateUserLabels();
+  userLabels.update();
   personalLabel = GmailApp.getUserLabelByName(personalLabelName);
 
   for (const label of unprocessedLabels) {
-    processLabel(userLabels[label]);
+    processLabel(userLabels.get(label));
   }
 }
 
@@ -60,7 +60,7 @@ function processLabel(unprocessedLabel) {
 
     for (const labelName of labelNames) {
       /* Get/create a label nested under our unprocessed label */
-      const label = getLabel(`${unprocessedLabel.getName()}/${labelName}`);
+      const label = userLabels.get(`${unprocessedLabel.getName()}/${labelName}`);
 
       if (!toAddThreads.has(label)) {
         toAddThreads.set(label, []);
@@ -111,22 +111,18 @@ function processLabel(unprocessedLabel) {
   }
 }
 
-/* Makes a hash table of "name" -> label */
-function makeNameToLabelTbl(labels) {
-  return Object.fromEntries(labels.map(label => [label.getName(), label]));
-}
+const userLabels = (() => {
+  let cache = {};
 
-/* Cache of user labels, indexed by name string */
-let userLabels = {};
-function updateUserLabels() {
-  userLabels = makeNameToLabelTbl(GmailApp.getUserLabels());
-}
-
-/* Returns a GmailLabel given a name string.
- * If it doesn't exist, it creates it. */
-function getLabel(name) {
-  if (!userLabels[name]) {
-    userLabels[name] = GmailApp.createLabel(name);
-  }
-  return userLabels[name];
-}
+  return {
+    update() {
+      cache = Object.fromEntries(GmailApp.getUserLabels().map(label => [label.getName(), label]));
+    },
+    get(name) {
+      if (!cache[name]) {
+        cache[name] = GmailApp.createLabel(name);
+      }
+      return cache[name];
+    },
+  };
+})();
