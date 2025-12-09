@@ -53,7 +53,7 @@ The `gmail-gitlab-filtering.gs` script searches for threads with that label, and
 
 The script records the value of all `X-GitLab-Project-Path` headers and whether any message in the thread contained a `X-GitLab-NotificationReason` header.
 
-Threads containing a `X-GitLab-NotificationReason` header retain the personal label and are moved to the inbox. Threads without `X-GitLab-NotificationReason` header remain archived and the personal label is removed. All threads are labeled with `${unprocessedLabel}/${X-GitLab-Project-Path}`, and the label is dynamically created if needed. The unprocessed label is always removed as the final step, in case the script's runtime exceeds the allowed timelimit (see below).
+Threads containing a `X-GitLab-NotificationReason` header retain the personal label and are moved to the inbox. Threads without `X-GitLab-NotificationReason` header remain archived and the personal label is removed. All threads are labeled with `${unprocessedLabel}/${X-GitLab-Project-Path}`, and the label is dynamically created if needed. The unprocessed label is always removed as the final step, in case the script's runtime exceeds the allowed time limit (see below).
 
 For example, if I were to receive a notification of a merge request in the [mesa/shader-db](https://gitlab.freedesktop.org/mesa/shader-db/) project that mentioned me, the script would move the thread to the inbox, leave the `mattst88` label intact, label the mail `freedesktop/mesa/shader-db` (creating the label if needed), and remove the `freedesktop` label.
 
