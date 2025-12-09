@@ -68,7 +68,7 @@ function processLabel(unprocessedLabel) {
 
 function processThread(unprocessedLabel, thread) {
   let moveToInbox = false;
-  let labelNames = [];
+  const labelNames = new Set();
 
   const messages = thread.getMessages();
   for (const message of messages) {
@@ -80,15 +80,12 @@ function processThread(unprocessedLabel, thread) {
       moveToInbox = true;
     }
 
-    /* Push the project path to a list. We'll deduplicate later. */
+    /* Collect project paths in a Set to automatically deduplicate */
     const projectPath = message.getHeader("X-GitLab-Project-Path");
     if (projectPath) {
-      labelNames.push(projectPath);
+      labelNames.add(projectPath);
     }
   }
-
-  /* Deduplicate labels list */
-  labelNames = labelNames.filter(onlyUnique);
 
   for (const labelName of labelNames) {
     /* Get/create a label nested under our unprocessed label */
@@ -141,8 +138,4 @@ function getLabel(name) {
     label = userLabels[name];
   }
   return label;
-}
-
-function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
 }
