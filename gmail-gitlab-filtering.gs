@@ -27,10 +27,10 @@ function processLabel(unprocessedLabel) {
     Logger.log("Processing threads with label:" + unprocessedLabel.getName());
   }
 
-  for (const i in threads) {
+  for (const [i, thread] of threads.entries()) {
     Logger.log("Processing thread " + i);
 
-    processThread(unprocessedLabel, threads[i]);
+    processThread(unprocessedLabel, thread);
   }
 
   /* the GmailLabel.addToThreads/removeFromThreads functions
