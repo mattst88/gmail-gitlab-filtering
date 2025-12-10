@@ -25,6 +25,13 @@ function processInChunks(threads, callback) {
   }
 }
 
+function getOrSetDefault(map, key, defaultValue) {
+  if (!map.has(key)) {
+    map.set(key, defaultValue);
+  }
+  return map.get(key);
+}
+
 function processLabel(unprocessedLabel) {
   const toInboxThreads = [];
   const toRemoveThreads = new Map();
@@ -62,25 +69,16 @@ function processLabel(unprocessedLabel) {
       /* Get/create a label nested under our unprocessed label */
       const label = userLabels.get(`${unprocessedLabel.getName()}/${labelName}`);
 
-      if (!toAddThreads.has(label)) {
-        toAddThreads.set(label, []);
-      }
-      toAddThreads.get(label).push(thread);
+      getOrSetDefault(toAddThreads, label, []).push(thread);
     }
 
     if (moveToInbox) {
       toInboxThreads.push(thread);
     } else {
-      if (!toRemoveThreads.has(personalLabel)) {
-        toRemoveThreads.set(personalLabel, []);
-      }
-      toRemoveThreads.get(personalLabel).push(thread);
+      getOrSetDefault(toRemoveThreads, personalLabel, []).push(thread);
     }
 
-    if (!toRemoveThreads.has(unprocessedLabel)) {
-      toRemoveThreads.set(unprocessedLabel, []);
-    }
-    toRemoveThreads.get(unprocessedLabel).push(thread);
+    getOrSetDefault(toRemoveThreads, unprocessedLabel, []).push(thread);
   }
 
   for (const [i, thread] of threads.entries()) {
